@@ -1,0 +1,166 @@
+Step 1: Setting up the Environment
+1.1 Install Node.js & React
+Install Node.js from here and create a React app:
+
+npx create-react-app webtoon-library
+cd webtoon-library
+npm start
+1.2 Set up MongoDB
+If using MongoDB:
+
+Set up an account on MongoDB Atlas or run MongoDB locally.
+Create a database for your project.
+Step 2: Front-End Development
+2.1 Home Page (React)
+Create a WebtoonCard component to display each webtoon.
+
+
+// WebtoonCard.js
+function WebtoonCard({ title, description, image }) {
+  return (
+    <div className="webtoon-card">
+      <img src={image} alt={title} />
+      <h3>{title}</h3>
+      <p>{description}</p>
+    </div>
+  );
+}
+export default WebtoonCard;
+Then, create a HomePage component to display a list of webtoons.
+
+jsx
+
+// HomePage.js
+import React, { useEffect, useState } from 'react';
+import WebtoonCard from './WebtoonCard';
+
+function HomePage() {
+  const [webtoons, setWebtoons] = useState([]);
+
+  useEffect(() => {
+    fetch('/api/webtoons') // API to get webtoons
+      .then(res => res.json())
+      .then(data => setWebtoons(data));
+  }, []);
+
+  return (
+    <div className="home-page">
+      {webtoons.map(webtoon => (
+        <WebtoonCard
+          key={webtoon.id}
+          title={webtoon.title}
+          description={webtoon.description}
+          image={webtoon.thumbnail}
+        />
+      ))}
+    </div>
+  );
+}
+
+export default HomePage;
+2.2 Webtoon Detail Page
+
+// WebtoonDetail.js
+import React, { useEffect, useState } from 'react';
+import { useParams } from 'react-router-dom';
+
+function WebtoonDetail() {
+  const { id } = useParams();
+  const [webtoon, setWebtoon] = useState(null);
+
+  useEffect(() => {
+    fetch(`/api/webtoons/${id}`) // Fetch detailed webtoon info
+      .then(res => res.json())
+      .then(data => setWebtoon(data));
+  }, [id]);
+
+  if (!webtoon) return <div>Loading...</div>;
+
+  return (
+    <div className="webtoon-detail">
+      <img src={webtoon.largeImage} alt={webtoon.title} />
+      <h2>{webtoon.title}</h2>
+      <p>{webtoon.description}</p>
+      {/* Add a comment section here */}
+    </div>
+  );
+}
+
+export default WebtoonDetail;
+Step 3: Back-End Development (Node.js + Express)
+Set up a Node.js server to serve webtoons and handle authentication.
+
+3.1 Install Dependencies
+
+npm install express mongoose jsonwebtoken bcryptjs cors
+3.2 Build API Endpoints
+js
+// server.js
+const express = require('express');
+const mongoose = require('mongoose');
+const app = express();
+app.use(express.json());
+
+// Connect to MongoDB
+mongoose.connect('mongodb://localhost:27017/webtoon-library', { useNewUrlParser: true });
+
+// Webtoon schema
+const WebtoonSchema = new mongoose.Schema({
+  title: String,
+  description: String,
+  thumbnail: String,
+  largeImage: String,
+});
+
+const Webtoon = mongoose.model('Webtoon', WebtoonSchema);
+
+// API to get all webtoons
+app.get('/api/webtoons', async (req, res) => {
+  const webtoons = await Webtoon.find();
+  res.json(webtoons);
+});
+
+// API to get webtoon by ID
+app.get('/api/webtoons/:id', async (req, res) => {
+  const webtoon = await Webtoon.findById(req.params.id);
+  res.json(webtoon);
+});
+
+app.listen(5000, () => console.log('Server running on port 5000'));
+Step 4: User Authentication with JWT
+Implement user authentication for login and registration.
+
+4.1 Set up Authentication Routes
+
+// auth.js (inside routes folder)
+const express = require('express');
+const User = require('../models/User'); // User schema
+const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+const router = express.Router();
+
+// Registration route
+router.post('/register', async (req, res) => {
+  const { username, password } = req.body;
+  const hashedPassword = await bcrypt.hash(password, 10);
+  const user = new User({ username, password: hashedPassword });
+  await user.save();
+  res.json({ message: 'User created' });
+});
+
+// Login route
+router.post('/login', async (req, res) => {
+  const { username, password } = req.body;
+  const user = await User.findOne({ username });
+  if (!user || !await bcrypt.compare(password, user.password)) {
+    return res.status(401).json({ message: 'Invalid credentials' });
+  }
+  const token = jwt.sign({ id: user._id }, 'secretkey');
+  res.json({ token });
+});
+
+module.exports = router;
+Step 5: Deploy the App
+Set up your project on Heroku.
+Deploy the back-end and front-end on Heroku or AWS.
+Use environment variables to keep API keys and secrets safe.
