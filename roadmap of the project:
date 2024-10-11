@@ -1,0 +1,34 @@
+Project Steps:
+Set Up the Environment
+
+Initialize the project in your local machine using Node.js or Python (Flask/Django).
+Set up the front-end framework (React, Vue, or Angular).
+Set up your database (MongoDB or MySQL).
+Front-End Development (React as an example)
+
+Create a React project.
+Build the Home Page that lists the webtoons using the data from the "Top 10 Popular Webtoons" article.
+Build the Webtoon Detail Page, following the structure from the "Lore Olympus" example.
+Add user login, registration forms, and set up authentication using JWT.
+Back-End Development (Node.js with Express as an example)
+
+Set up a Node.js server using Express.
+Create API endpoints for handling webtoon data, user authentication, and user favorites.
+Integrate JWT for authentication.
+Set up a database schema for webtoons and user favorites in MongoDB or MySQL.
+Create APIs to fetch and display webtoon details and store/retrieve user favorites.
+User Authentication
+
+Implement user authentication using JWT.
+Create login and registration APIs that will store user information in the database.
+Protect routes such as favorites to ensure only logged-in users can access them.
+Favorites Page
+
+Allow users to mark webtoons as favorites.
+Display the list of user’s favorite webtoons by fetching from the database.
+Ensure data persists across sessions (using MongoDB or MySQL).
+Deployment
+
+Deploy the app on Heroku or AWS.
+Set up environment variables securely for API keys and sensitive data.
+Make sure the app is publicly accessible and fully functional.
